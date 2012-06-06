@@ -1,6 +1,6 @@
 if (Meteor.is_client) {
 	Messages = new Meteor.Collection("messages");
-	Session.set("coords", "?");
+	Session.set("coords", "N/A");
 	Session.set("lat", "0");
 	Session.set("lon", "0");
 	Session.set("yourlink", "?");
@@ -15,12 +15,27 @@ if (Meteor.is_client) {
 
 	Template.main.coords = function() {
 		if (Modernizr.geolocation) {
-		      // timeout at 60000 milliseconds (60 seconds)
-            var options = {timeout:60000, enableHighAccuracy:true};
-            navigator.geolocation.watchPosition(setcoords, null, options);
+			Session.set("coords","Aquiring GPS position... Please wait...");
+		      // timeout at 300,000 milliseconds (5 minuites)
+            		var options = {timeout:300000, maximumAge:1000, enableHighAccuracy:true};
+            		navigator.geolocation.watchPosition(setcoords, geo_error, options);
 		}
 		return Session.get("coords");
 	};
+
+	function geo_error(error)
+	{
+		switch(error.code)
+		{
+			case error.TIMEOUT:
+				Session.set("coords","GPS timed out");
+				break;
+			case error.POSITION_UNAVAILABLE:
+				Session.set("coords","The position of the device could not be determined");
+				break;
+		}
+	}	
+
 	function setcoords(position) {
 	    var lon = position.coords.longitude.toFixed(4);
 		var lat = position.coords.latitude.toFixed(4);
