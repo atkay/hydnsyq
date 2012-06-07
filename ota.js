@@ -4,7 +4,8 @@ if (Meteor.is_client) {
 	Session.set("lat", "0");
 	Session.set("lon", "0");
 	Session.set("yourlink", "?");
-	
+	Session.set("gpsAccuracy","1000");
+	Session.set("errormessage","");
 	Template.main.get = function() {
 		if (window.location.pathname.length>2) {
 			return true;
@@ -30,10 +31,10 @@ if (Meteor.is_client) {
 		switch(error.code)
 		{
 			case error.TIMEOUT:
-				Session.set("coords","GPS timed out");
+				Session.set("errormessage","Error: GPS timed out");
 				break;
 			case error.POSITION_UNAVAILABLE:
-				Session.set("coords","The position of the device could not be determined");
+				Session.set("errormessage","Error: The position of the device could not be determined");
 				break;
 		}
 	}	
@@ -41,11 +42,19 @@ if (Meteor.is_client) {
 	function setcoords(position) {
 	    var lon = position.coords.longitude.toFixed(4);
 		var lat = position.coords.latitude.toFixed(4);
+		var accuracy = position.coords.accuracy;
 		Session.set("lat", lat);
 		Session.set("lon", lon);
-		Session.set("coords", lat+","+lon);
-	}
+		Session.set("gpsAccuracy",accuracy);
+		if(accuracy > 50)
+		{
+			Session.set("coords", "Latitude: "+lat+", Longitude: "+lon+", Accuracy: "+accuracy+"m, GPS accuracy too low for encryption");
 
+		}else{
+			Session.set("coords", "Latitude: "+lat+", Longitude: "+lon+", Accuracy: "+accuracy+"m");
+
+		}
+	}
 	Template.set.yourlink = function() {
 		return "/"+Session.get("yourlink");
 	};
@@ -59,15 +68,21 @@ if (Meteor.is_client) {
 	Template.get.plaintext = function() {
 		return decrypt(Session.get("ciphertext"));
 	};
+	
+	Template.main.errormessage = function(){
+		return Session.get("errormessage");
+	};
 
 	function encrypt(string) {
 		var lat = Session.get("lat");
 		var lon = Session.get("lon");
+		var accuracy = Session.get("gpsAccuracy");
 		return crypt(string, [lat, lon], false);
 	}
 	function decrypt(string) {
 		var lat = Session.get("lat");
 		var lon = Session.get("lon");
+		var accuracy = Session.get("gpsAccuracy");
 		return crypt(string, [lat, lon], true);
 	}
 	function crypt(string, coords, decrypt) {
@@ -119,11 +134,17 @@ if (Meteor.is_client) {
 			var text = document.getElementById("set-message-text");
 			var ciphertext = encrypt(text.value);
 			var escaped = escape(ciphertext);
+			var accuracy = Session.get("gpsAccuracy");
 			Session.set("yourlink", escaped);
-			window.location = escaped;
+			if(accuracy < 50)
+			{
+				window.location = escaped;
+			}else{
+				Session.set("errormessage","Error: Cannot encrypt, GPS accuracy too low.");
+			}
 			event.preventDefault ? event.preventDefault() : event.returnValue = false;
 			
-		},
+		}/*,
 		'keyup #set-message-text': function() {
 			if(Modernizr.history)
 			{			
@@ -135,7 +156,7 @@ if (Meteor.is_client) {
 	  			event.preventDefault ? event.preventDefault() : event.returnValue = false;
 		    		event.stopPropagation();
 			}
-		}
+		}*/
 	};
 	Template.set.savedmessages = function() {
 		return Messages.find();
