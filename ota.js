@@ -94,7 +94,6 @@ if (Meteor.is_client) {
 				}
 				if (decrypt===true) {
 					this_key = 26 - this_key;
-					console.log("Decrypting");
 				};
 				var letter = letters[letter];	
 				var charcode = letter.charCodeAt(0);
@@ -116,13 +115,26 @@ if (Meteor.is_client) {
 		return output;
 	}
 	Template.set.events = {
-		'keyup #set-message-text': function() {
+		'submit #set-message': function(){		
 			var text = document.getElementById("set-message-text");
 			var ciphertext = encrypt(text.value);
 			var escaped = escape(ciphertext);
 			Session.set("yourlink", escaped);
-			history.pushState(null, null, "/"+escaped);
-  			event.preventDefault();
+			window.location = escaped;
+			event.preventDefault ? event.preventDefault() : event.returnValue = false;
+			
+		},
+		'keyup #set-message-text': function() {
+			if(Modernizr.history)
+			{			
+				var text = document.getElementById("set-message-text");
+				var ciphertext = encrypt(text.value);
+				var escaped = escape(ciphertext);
+				Session.set("yourlink", escaped);
+				history.pushState(null, null, "/"+escaped);
+	  			event.preventDefault ? event.preventDefault() : event.returnValue = false;
+		    		event.stopPropagation();
+			}
 		}
 	};
 	Template.set.savedmessages = function() {
