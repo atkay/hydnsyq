@@ -1,1 +1,115 @@
-/* CSS declarations go here */
+@media screen and (max-width:480px) {
+
+body {
+
+    font-family: "Segoe WP,Tahoma,Geneva,Verdana";
+
+    background-color: #000000;
+
+    color: #ffffff;
+
+    padding: 18px;
+
+}
+
+h1, h2, h3, h4, h5, h6 {
+
+    font-family:"Segoe WP Semibold";
+
+    margin-bottom:7px;
+
+}
+
+h1 {
+
+    font-size: 48pt;
+
+}
+
+h2 {
+
+    font-size: 40pt;
+
+}
+
+h3 {
+
+    font-size:32pt;
+
+}
+
+h4 {
+
+    font-size:24pt;
+
+}
+
+h5 {
+
+    font-size:20pt;
+
+}
+
+h6 {
+
+    font-size:18pt;
+
+}
+
+p {
+
+    font-size: 14pt;
+
+}
+
+input, select, button {
+
+    color: #ffffff;
+
+    background-color: #000000;
+
+    border: 2px solid white;
+
+    vertical-align: baseline;
+
+    font-size: 17pt;
+
+    min-width: 40px;
+
+    min-height: 40px;
+
+}
+
+label {
+
+    vertical-align:baseline;
+
+    font-size:17pt;
+
+}
+
+input.hasfocus {
+
+    background-color:white;
+
+    color:black
+
+}
+
+fieldset, legend {
+
+    font-family:"Segoe UI Semibold";
+
+    font-size:12pt;
+
+}
+
+fieldset {
+
+    padding:12pt;
+
+    border: 1px solid white;
+
+}
+
+}
