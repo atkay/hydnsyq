@@ -1,6 +1,6 @@
 if (Meteor.is_client) {
 	Messages = new Meteor.Collection("messages");
-	Session.set("coords", "N/A");
+	Session.set("coords", "Aquiring GPS Signal, please wait....");
 	Session.set("lat", "0");
 	Session.set("lon", "0");
 	Session.set("yourlink", "?");
@@ -15,11 +15,13 @@ if (Meteor.is_client) {
 
 	Template.main.coords = function() {
 		if (Modernizr.geolocation) {
-			Session.set("coords","Aquiring GPS position... Please wait...");
 		      // timeout at 300,000 milliseconds (5 minuites)
             		var options = {timeout:300000, maximumAge:1000, enableHighAccuracy:true};
             		navigator.geolocation.watchPosition(setcoords, geo_error, options);
-		}
+		}else
+        {
+            Session.set("coords","GPS cannot be used with your device");
+        }
 		return Session.get("coords");
 	};
 
